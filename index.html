@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landinformatie Vergelijking</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #result {
+      margin-top: 20px;
+    }
+
+    .info {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+    }
+
+    .info h2 {
+      margin-top: 0;
+    }
+
+    img {
+      width: 200px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Landinformatie Vergelijking</h1>
+    <input type="text" id="countryInput" placeholder="Typ een land in...">
+    <button id="searchBtn">Zoek</button>
+    <div id="result"></div>
+  </div>
+  <script>
+    document.getElementById('searchBtn').addEventListener('click', function () {
+      const country = document.getElementById('countryInput').value.trim();
+
+      if (!country) {
+        alert('Vul een land in!');
+        return;
+      }
+
+      fetch(`https://restcountries.com/v3.1/name/${country}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Land niet gevonden!');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const countryData = data[0];
+
+          const resultDiv = document.getElementById('result');
+          resultDiv.innerHTML = `
+            <div class="info">
+              <h2>${countryData.name.common}</h2>
+              <p><strong>Hoofdstad:</strong> ${countryData.capital ? countryData.capital[0] : 'N/A'}</p>
+              <p><strong>Regio:</strong> ${countryData.region}</p>
+              <p><strong>Bevolking:</strong> ${countryData.population.toLocaleString()}</p>
+              <p><strong>Oppervlakte:</strong> ${countryData.area.toLocaleString()} km²</p>
+              <p><strong>Taal:</strong> ${Object.values(countryData.languages).join(', ')}</p>
+              <p><strong>Munteenheid:</strong> ${Object.values(countryData.currencies).map(c => c.name).join(', ')}</p>
+              <p><strong>Vlag:</strong></p>
+              <img src="${countryData.flags.svg}" alt="Vlag van ${countryData.name.common}">
+            </div>
+          `;
+        })
+        .catch(error => {
+          console.error(error);
+          alert(error.message || 'Er is een fout opgetreden!');
+        });
+    });
+  </script>
+</body>
+</html>
